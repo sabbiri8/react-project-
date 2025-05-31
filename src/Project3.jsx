@@ -91,13 +91,17 @@ function CodeBlock({ id, title, codeString, ComponentToRender, sampleProps = {} 
 }
 
 // ============================================================================
-// 1. Single Responsibility Principle
+// 1. Single Responsibility Principle (SRP)
 // ============================================================================
+// This section demonstrates how to apply the Single Responsibility Principle
+// by breaking down components and hooks into smaller, focused units.
 
-// Simulating API call
+// Step 1: Simulate an API call
+// This function simulates fetching data from a backend.
 const mockFetchData = () => new Promise(resolve => setTimeout(() => resolve({ message: 'Data fetched!' }), 1000));
 
-// ✅ Single responsibility: managing data
+// Step 2: Create a custom hook for data fetching (useFetchData.js)
+// This hook is solely responsible for managing data fetching state (data, loading, error).
 function useFetchData() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -114,35 +118,13 @@ function useFetchData() {
         setError(err);
         setLoading(false);
       });
-  }, []);
+  }, []); // Empty dependency array means this effect runs once on mount
 
   return { data, loading, error };
 }
 
-// Simulating react-query's useQuery
-function useQueryMock({ queryKey, queryFn }) {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    setIsLoading(true);
-    queryFn()
-      .then(res => res.json ? res.json() : res) // Handle mockFetchData returning object directly
-      .then(d => {
-        setData(d);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsError(true);
-        setIsLoading(false);
-      });
-  }, [queryKey[0]]); // Simplified dependency
-
-  return { data, isLoading, isError };
-}
-
-// Simulating analytics event sender
+// Step 3: Create a custom hook for analytics (usePageAnalytics.js)
+// This hook is responsible for sending analytics events.
 const sendAnalyticsEvent = (eventName, eventData) => {
   console.log(`Analytics Event: ${eventName}`, eventData);
   const messageBox = document.getElementById('messageBox');
@@ -154,14 +136,14 @@ const sendAnalyticsEvent = (eventName, eventData) => {
   }
 };
 
-// ✅ Single responsibility: managing analytics
 function usePageAnalytics(event) {
   useEffect(() => {
     sendAnalyticsEvent('page_view', event);
-  }, [event]);
+  }, [event]); // Re-run if the event object changes
 }
 
-// ✅ Single responsibility: managing modals
+// Step 4: Create a dedicated Modal component (Modal.js)
+// This component is responsible for managing its own open/close state and rendering its children as modal content.
 function Modal({ children }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const theme = useContext(ThemeContext);
@@ -195,12 +177,13 @@ function Modal({ children }) {
   );
 }
 
-// ✅ Single responsibility: put everything together
+// Step 5: Create a "BigComponent" that orchestrates these smaller units
+// This component's responsibility is to assemble and coordinate the other single-responsibility units.
 function BigComponentSRP() {
   const { data, loading, error } = useFetchData(); // Using simulated hook
   const theme = useContext(ThemeContext);
 
-  usePageAnalytics({ page: 'big_component_srp' });
+  usePageAnalytics({ page: 'big_component_srp' }); // Using analytics hook
 
   return (
     <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-indigo-700 text-indigo-100' : 'bg-indigo-100 text-indigo-800'}`}>
@@ -222,8 +205,10 @@ function BigComponentSRP() {
 // ============================================================================
 // 2. Container and Presentation Components
 // ============================================================================
+// This pattern separates concerns into components that handle logic (container)
+// and components that handle rendering UI (presentation).
 
-// Mock filter function
+// Step 1: Create a mock filter function (e.g., in a utils file)
 const filterItems = (items, filters) => {
   if (!filters.searchTerm) return items;
   return items.filter(item =>
@@ -231,6 +216,8 @@ const filterItems = (items, filters) => {
   );
 };
 
+// Step 2: Create a Presentation Component (ItemCard.js)
+// Responsible for rendering a single item's UI.
 function ItemCard({ item }) {
   const theme = useContext(ThemeContext);
   return (
@@ -241,7 +228,9 @@ function ItemCard({ item }) {
   );
 }
 
-// Presentation component responsible for UI
+// Step 3: Create another Presentation Component (PresentationComponent.js)
+// Responsible for rendering the list of items and the search input. It receives
+// data and event handlers via props.
 function PresentationComponent({ items, onSearchChange }) {
   const theme = useContext(ThemeContext);
   return (
@@ -261,7 +250,9 @@ function PresentationComponent({ items, onSearchChange }) {
   );
 }
 
-// Container component responsible for logic
+// Step 4: Create a Container Component (ContainerComponent.js)
+// Responsible for managing state, fetching data (if applicable), and passing
+// filtered data and event handlers to the PresentationComponent.
 function ContainerComponent() {
   const [allItems] = useState([
     { id: 1, name: 'Apple', category: 'Fruit' },
@@ -286,9 +277,14 @@ function ContainerComponent() {
 // ============================================================================
 // 3. Compound Components Pattern
 // ============================================================================
+// This pattern allows multiple components to work together with shared state
+// and implicit communication, often using React Context.
 
+// Step 1: Create a Context for the compound component's shared state
 const ToggleContext = createContext(undefined);
 
+// Step 2: Create the main "parent" component (Toggle.js)
+// This component manages the shared state and provides it via context.
 function Toggle({ children }) {
   const [on, setOn] = useState(false);
   const theme = useContext(ThemeContext);
@@ -306,6 +302,8 @@ function Toggle({ children }) {
   );
 }
 
+// Step 3: Create "child" components as properties of the parent (Toggle.On, Toggle.Off, Toggle.Button)
+// These components consume the context to access the shared state and functions.
 Toggle.On = function ToggleOn({ children }) {
   const { on } = useContext(ToggleContext);
   return on ? children : null;
@@ -330,10 +328,24 @@ Toggle.Button = function ToggleButton(props) {
   );
 };
 
+// Step 4: Demonstrate usage of Compound Components
+function CompoundComponentDemo() {
+  return (
+    <Toggle>
+      <Toggle.On>The button is currently ON!</Toggle.On>
+      <Toggle.Off>The button is currently OFF.</Toggle.Off>
+      <Toggle.Button />
+    </Toggle>
+  );
+}
+
 // ============================================================================
 // 4. Nested Prop Forwarding
 // ============================================================================
+// This pattern allows props to be passed down through multiple layers of
+// components, giving flexibility to customize deeply nested elements.
 
+// Step 1: Create a base Text component
 function Text({ children, ...rest }) {
   const theme = useContext(ThemeContext);
   return (
@@ -343,6 +355,7 @@ function Text({ children, ...rest }) {
   );
 }
 
+// Step 2: Create a Button component that accepts props for a nested Text component
 function ButtonPropForwarding({ children, textProps, ...rest }) {
   const theme = useContext(ThemeContext);
   return (
@@ -350,15 +363,35 @@ function ButtonPropForwarding({ children, textProps, ...rest }) {
       className={`py-2 px-4 rounded-lg font-semibold ${theme === 'dark' ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-red-500 hover:bg-red-600 text-white'}`}
       {...rest}
     >
+      {/* Forward textProps to the Text component */}
       <Text {...textProps}>{children}</Text>
     </button>
+  );
+}
+
+// Step 3: Demonstrate usage of Nested Prop Forwarding
+function NestedPropForwardingDemo() {
+  const theme = useContext(ThemeContext);
+  return (
+    <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-red-800 text-red-100' : 'bg-red-100 text-red-800'}`}>
+      <h4 className="font-semibold mb-2">Nested Prop Forwarding Demo:</h4>
+      <ButtonPropForwarding textProps={{ className: 'text-yellow-300' }}>
+        Button with yellow text
+      </ButtonPropForwarding>
+      <p className="text-sm italic mt-2">
+        The `textProps` are forwarded to the inner `Text` component.
+      </p>
+    </div>
   );
 }
 
 // ============================================================================
 // 5. Children Components Pattern
 // ============================================================================
+// This pattern leverages React's `children` prop to pass components directly
+// as children, which can help optimize re-renders and improve component composition.
 
+// Step 1: Create an "Expensive" component that logs its renders
 function ExpensiveComponent() {
   const theme = useContext(ThemeContext);
   const renderCount = useRef(0);
@@ -373,6 +406,7 @@ function ExpensiveComponent() {
   );
 }
 
+// Step 2: Create a parent component that accepts `children`
 function ComponentChildrenPattern({ children }) {
   const [count, setCount] = useState(0);
   const theme = useContext(ThemeContext);
@@ -386,6 +420,7 @@ function ComponentChildrenPattern({ children }) {
       >
         Increment Parent
       </button>
+      {/* Render children here */}
       {children}
       <p className="text-sm italic mt-2">
         The "Expensive Component" below is passed as children and does not re-render when the parent's state changes.
@@ -394,10 +429,22 @@ function ComponentChildrenPattern({ children }) {
   );
 }
 
+// Step 3: Demonstrate usage by passing ExpensiveComponent as a child
+function ChildrenComponentsPatternDemo() {
+  return (
+    <ComponentChildrenPattern>
+      <ExpensiveComponent />
+    </ComponentChildrenPattern>
+  );
+}
+
 // ============================================================================
 // 6. Custom Hooks
 // ============================================================================
+// Custom hooks allow you to extract reusable stateful logic from components,
+// making your components cleaner and logic more shareable.
 
+// Step 1: Create a mock filter function for items
 const mockFilterItems = (items, filters) => {
   if (!filters.searchTerm) return items;
   return items.filter(item =>
@@ -405,6 +452,8 @@ const mockFilterItems = (items, filters) => {
   );
 };
 
+// Step 2: Create a custom hook `useFilteredItems`
+// This hook encapsulates the filtering logic and state management for a list of items.
 function useFilteredItems(initialItems) {
   const [items, setItems] = useState(initialItems);
   const [filters, setFilters] = useState({ searchTerm: '' });
@@ -426,6 +475,7 @@ function useFilteredItems(initialItems) {
   };
 }
 
+// Step 3: Create a component that uses the custom hook
 function ComponentCustomHook() {
   const initialData = [
     { id: 1, name: 'Laptop' },
@@ -460,9 +510,13 @@ function ComponentCustomHook() {
 // ============================================================================
 // 7. Higher Order Components (HOC)
 // ============================================================================
+// HOCs are functions that take a component and return a new component with
+// enhanced functionality or props.
 
-// ✅ Higher order component to implement styles
+// Step 1: Create a Higher Order Component (withStyles.js)
+// This HOC adds common styling to any wrapped component.
 function withStyles(Component) {
+  // The returned component is the HOC itself
   return function HOC(props) {
     const style = { padding: '8px', margin: '12px', borderRadius: '4px' };
     const theme = useContext(ThemeContext);
@@ -475,11 +529,12 @@ function withStyles(Component) {
       color: theme === 'dark' ? '#F9FAFB' : '#1F2937', // text-gray-50 / text-gray-900
     };
 
+    // Render the original component, passing the enhanced style and other props
     return <Component style={themedStyle} {...props} />;
   };
 }
 
-// Inner components receive style through props
+// Step 2: Create simple components that will receive styles via props
 function StyledButton({ style, children, ...props }) {
   return <button style={style} {...props}>{children}</button>;
 }
@@ -487,10 +542,11 @@ function StyledTextInput({ style, ...props }) {
   return <input type="text" style={style} {...props} />;
 }
 
-// ✅ Wrap exports with HOC
+// Step 3: Wrap the components with the HOC to enhance them
 const EnhancedButton = withStyles(StyledButton);
 const EnhancedTextInput = withStyles(StyledTextInput);
 
+// Step 4: Demonstrate usage of the enhanced components
 function HOCDemo() {
   const theme = useContext(ThemeContext);
   return (
@@ -508,17 +564,23 @@ function HOCDemo() {
 // ============================================================================
 // 8. Variant Props
 // ============================================================================
+// This pattern uses props to define different visual "variants" of a component,
+// centralizing styling logic and making components more flexible.
 
+// Step 1: Create a component that accepts `variant` and `size` props
 function ButtonVariant({ variant = 'primary', size = 'md', children, ...rest }) {
   const theme = useContext(ThemeContext);
 
+  // Base styles applied to all buttons
   const baseStyle = "py-2 px-4 rounded-lg font-semibold transition-colors duration-200";
 
+  // Define styles for different variants
   const variantStyles = {
     primary: theme === 'dark' ? "bg-blue-600 hover:bg-blue-500 text-white" : "bg-blue-500 hover:bg-blue-600 text-white",
     secondary: theme === 'dark' ? "bg-gray-600 hover:bg-gray-500 text-gray-100" : "bg-gray-300 hover:bg-gray-400 text-gray-800",
   };
 
+  // Define styles for different sizes
   const sizeStyles = {
     sm: "text-sm",
     md: "text-base",
@@ -527,6 +589,7 @@ function ButtonVariant({ variant = 'primary', size = 'md', children, ...rest }) 
 
   return (
     <button
+      // Combine base, variant, and size styles using template literals
       className={`${baseStyle} ${variantStyles[variant]} ${sizeStyles[size]}`}
       {...rest}
     >
@@ -535,6 +598,7 @@ function ButtonVariant({ variant = 'primary', size = 'md', children, ...rest }) 
   );
 }
 
+// Step 2: Demonstrate usage of the ButtonVariant with different props
 function VariantPropsDemo() {
   const theme = useContext(ThemeContext);
   return (
@@ -553,12 +617,16 @@ function VariantPropsDemo() {
 // ============================================================================
 // 9. Expose functionality through ref (useImperativeHandle)
 // ============================================================================
+// `useImperativeHandle` allows you to customize the instance value that is
+// exposed to parent components when using `ref`. This is useful for exposing
+// specific methods or properties of a child component without exposing its internal state.
 
+// Step 1: Create a child component and wrap it with `forwardRef`
 const ComponentWithImperativeHandle = forwardRef(({}, ref) => {
   const [count, setCount] = useState(0);
   const theme = useContext(ThemeContext);
 
-  // ✅ Exposes custom reset function to parent through ref to change state
+  // Step 2: Use `useImperativeHandle` to expose specific functions via the ref
   useImperativeHandle(ref, () => ({
     reset: () => {
       setCount(0);
@@ -585,10 +653,12 @@ const ComponentWithImperativeHandle = forwardRef(({}, ref) => {
   );
 });
 
+// Step 3: Create a parent component that uses the child component and its ref
 function ImperativeHandleDemo() {
-  const componentRef = useRef(null);
+  const componentRef = useRef(null); // Create a ref
   const theme = useContext(ThemeContext);
 
+  // Function to call the exposed `reset` method on the child component
   const handleReset = () => {
     if (componentRef.current) {
       componentRef.current.reset();
@@ -602,6 +672,7 @@ function ImperativeHandleDemo() {
     }
   };
 
+  // Function to call the exposed `increment` method on the child component
   const handleIncrementFromParent = () => {
     if (componentRef.current) {
       componentRef.current.increment();
@@ -618,6 +689,7 @@ function ImperativeHandleDemo() {
   return (
     <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-lime-800 text-lime-100' : 'bg-lime-200 text-lime-900'}`}>
       <h4 className="font-semibold mb-2">useImperativeHandle Demo:</h4>
+      {/* Attach the ref to the child component */}
       <ComponentWithImperativeHandle ref={componentRef} />
       <div className="mt-4 space-x-2">
         <button
@@ -640,12 +712,17 @@ function ImperativeHandleDemo() {
 // ============================================================================
 // 10. Use providers for frequently used data (Context API)
 // ============================================================================
+// The Context API provides a way to pass data through the component tree
+// without having to pass props down manually at every level. This is ideal
+// for "global" data like user information or themes.
 
+// Step 1: Create a Context for user data
 const UserContext = createContext(undefined);
 
-// Mock fetch user data
+// Step 2: Create a mock function to fetch user data
 const mockFetchUser = () => new Promise(resolve => setTimeout(() => resolve({ name: 'John Doe', email: 'john.doe@example.com' }), 1500));
 
+// Step 3: Create a custom hook to fetch user data
 function useFetchUser() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -660,6 +737,9 @@ function useFetchUser() {
   return { data: user, loading };
 }
 
+// Step 4: Create a UserProvider component
+// This component fetches the user data and makes it available to its children
+// via the UserContext.Provider.
 function UserProvider({ children }) {
   const { data: user, loading } = useFetchUser();
   const theme = useContext(ThemeContext);
@@ -685,7 +765,7 @@ function UserProvider({ children }) {
   );
 }
 
-// Custom hook to easily access context
+// Step 5: Create a custom hook to easily consume the UserContext
 function useUser() {
   const context = useContext(UserContext);
 
@@ -696,6 +776,7 @@ function useUser() {
   return context;
 }
 
+// Step 6: Create components that consume the user data from context
 function Component1Context() {
   const { user } = useUser();
   const theme = useContext(ThemeContext);
@@ -719,6 +800,7 @@ function Component2Context() {
   );
 }
 
+// Step 7: Demonstrate usage by wrapping components with the UserProvider
 function ProviderDemo() {
   const theme = useContext(ThemeContext);
   return (
@@ -885,7 +967,7 @@ function NestedPropForwardingDemo() {
   );
 }
           `,
-          ComponentToRender: () => <ButtonPropForwarding textProps={{ className: 'text-red-500' }}>Button with red text</ButtonPropForwarding>,
+          ComponentToRender: () => <NestedPropForwardingDemo />,
         },
       ],
     },
