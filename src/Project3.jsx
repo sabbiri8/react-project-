@@ -159,9 +159,10 @@ function Modal({ children }) {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"> {/* Added p-4 for modal container on small screens */}
           <div className={`p-4 sm:p-6 rounded-lg shadow-lg relative ${theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'}`}>
+            {/* Added p-1 for easier touch target */}
             <button
               onClick={toggleModal}
-              className={`absolute top-2 right-2 text-xl p-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} hover:text-red-500`} {/* Added p-1 for easier touch target */}
+              className={`absolute top-2 right-2 text-xl p-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} hover:text-red-500`}
             >
               &times;
             </button>
