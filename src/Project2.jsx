@@ -89,14 +89,14 @@ hook is used in functional components to add state.
 */
 
 // Example: A Counter component using useState
-function Counter() {
+function Counter() { // Live component for stateCode
   const [count, setCount] = useState(0); // Initialize count to 0
 
   const increment = () => setCount(prevCount => prevCount + 1);
   const decrement = () => setCount(prevCount => prevCount - 1);
 
   return (
-    <div className="p-4 bg-purple-100 rounded-lg shadow-md flex items-center justify-center space-x-4">
+    <div className="p-4 bg-purple-100 rounded-lg shadow-md flex flex-wrap items-center justify-center space-x-4 gap-y-2">
       <button
         onClick={decrement}
         className="px-3 py-1 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors"
@@ -248,7 +248,7 @@ function ToggleSwitch() {
   };
 
   return (
-    <div className="p-4 bg-teal-100 rounded-lg shadow-md flex items-center justify-between">
+    <div className="p-4 bg-teal-100 rounded-lg shadow-md flex flex-wrap items-center justify-between gap-2">
       <span className="text-teal-800 text-lg">Status: {isOn ? 'ON' : 'OFF'}</span>
       <button
         onClick={handleToggle}
@@ -443,13 +443,13 @@ const counterReducer = (state, action) => {
   }
 };
 
-function ComplexCounter() {
+function ComplexCounter() { // Live component for useReducerHookCode
   const [state, dispatch] = useReducer(counterReducer, { count: 0 });
 
   return (
     <div className="p-4 bg-lime-100 rounded-lg shadow-md flex flex-col space-y-3">
       <p className="text-lime-800 text-2xl font-bold text-center">Count: {state.count}</p>
-      <div className="flex justify-center space-x-2">
+      <div className="flex flex-wrap justify-center space-x-2 gap-2">
         <button
           onClick={() => dispatch({ type: 'INCREMENT' })}
           className="px-3 py-1 bg-lime-500 text-white rounded-md hover:bg-lime-600 transition-colors"
@@ -469,7 +469,7 @@ function ComplexCounter() {
           Reset
         </button>
       </div>
-      <div className="flex justify-center space-x-2">
+      <div className="flex justify-center space-x-2"> {/* This div only has one input, so flex-wrap not critical but harmless */}
         <input
           type="number"
           className="p-2 border border-lime-300 rounded-md w-24"
@@ -557,7 +557,7 @@ const CodeBlock = ({ id, title, codeString, ComponentToRender, sampleProps = {} 
   const theme = useContext(ThemeContext); // Access the current theme
 
   return (
-    <div id={id} className={`mb-10 p-6 rounded-xl shadow-lg transition-all duration-300
+    <div id={id} className={`mb-10 p-4 sm:p-6 rounded-xl shadow-lg transition-all duration-300
       ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}
       border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}
       max-w-full overflow-hidden
@@ -1004,7 +1004,7 @@ const App = () => {
           {/* Main Content Area */}
           <main>
             {/* Introduction Section */}
-            <section className={`mb-10 p-6 rounded-xl shadow-lg
+            <section className={`mb-10 p-4 sm:p-6 rounded-xl shadow-lg
               ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}
               border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}
             `}>
@@ -1022,7 +1022,7 @@ const App = () => {
             </section>
 
             {/* Table of Contents / Navigation */}
-            <section className={`mb-10 p-6 rounded-xl shadow-lg
+            <section className={`mb-10 p-4 sm:p-6 rounded-xl shadow-lg
               ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}
               border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}
             `}>

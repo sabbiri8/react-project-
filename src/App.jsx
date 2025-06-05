@@ -76,7 +76,7 @@ export default function App() {
       </div>
 
       {/* Content area, now larger and with a fade-in transition */}
-      <div className="w-full max-w-6xl min-h-[600px] bg-white rounded-xl shadow-lg p-8 sm:p-10 lg:p-16 transition-opacity duration-500 ease-in-out animate-fade-in">
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-4xl lg:max-w-6xl min-h-[600px] bg-white rounded-xl shadow-lg p-8 sm:p-10 lg:p-16 transition-opacity duration-500 ease-in-out animate-fade-in">
         {renderContent()}
       </div>
     </div>

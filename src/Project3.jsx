@@ -161,11 +161,11 @@ function Modal({ children }) {
         {isModalOpen ? 'Close Modal' : 'Open Modal'}
       </button>
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`p-6 rounded-lg shadow-lg relative ${theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'}`}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"> {/* Added p-4 for modal container on small screens */}
+          <div className={`p-4 sm:p-6 rounded-lg shadow-lg relative ${theme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'}`}>
             <button
               onClick={toggleModal}
-              className={`absolute top-2 right-2 text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} hover:text-red-500`}
+              className={`absolute top-2 right-2 text-xl p-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} hover:text-red-500`} {/* Added p-1 for easier touch target */}
             >
               &times;
             </button>
@@ -691,7 +691,7 @@ function ImperativeHandleDemo() {
       <h4 className="font-semibold mb-2">useImperativeHandle Demo:</h4>
       {/* Attach the ref to the child component */}
       <ComponentWithImperativeHandle ref={componentRef} />
-      <div className="mt-4 space-x-2">
+      <div className="mt-4 flex flex-wrap gap-2"> {/* Changed to flex flex-wrap gap-2 */}
         <button
           onClick={handleReset}
           className={`py-2 px-4 rounded-lg font-semibold ${theme === 'dark' ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-red-500 hover:bg-red-600 text-white'}`}
@@ -1171,7 +1171,7 @@ function ChildrenComponentsPatternDemo() {
           {/* Main content area */}
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Table of Contents */}
-            <aside className={`w-full lg:w-1/4 p-6 rounded-lg shadow-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} sticky top-4 h-fit`}>
+            <aside className={`w-full lg:w-1/4 p-4 sm:p-6 rounded-lg shadow-xl ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} sticky top-4 h-fit`}>
               <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Table of Contents</h2>
               <nav>
                 <ul className="space-y-2">
@@ -1192,7 +1192,7 @@ function ChildrenComponentsPatternDemo() {
             {/* Design Patterns Content */}
             <main className="w-full lg:w-3/4">
               {designPatterns.map(pattern => (
-                <section key={pattern.id} id={pattern.id} className={`mb-12 p-6 rounded-lg shadow-xl ${theme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'}`}>
+                <section key={pattern.id} id={pattern.id} className={`mb-12 p-4 sm:p-6 rounded-lg shadow-xl ${theme === 'dark' ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'}`}>
                   <h2 className={`text-2xl sm:text-3xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
                     {pattern.title}
                   </h2>
