@@ -27,30 +27,26 @@ function CodeBlock({ id, title, codeString, ComponentToRender, sampleProps = {} 
   useEffect(() => {
     if (codeRef.current) {
       // Basic syntax highlighting
-      codeRef.current.innerHTML = codeString
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"(.*?)"/g, '<span class="text-green-400">"$&"</span>') // Strings
-        .replace(/\b(function|const|let|var|return|export|import|if|else|switch|case|break|default|throw|new|this|true|false|null|undefined)\b/g, '<span class="text-blue-400">$&</span>') // Keywords
-        .replace(/\b(useState|useEffect|useContext|useRef|useReducer|useCallback|forwardRef|useImperativeHandle)\b/g, '<span class="text-purple-400">$&</span>') // React Hooks
-        .replace(/(\/\/.*|\/\*[\s\S]*?\*\/)/g, '<span class="text-gray-500">$&</span>'); // Comments
+      // The actual code string is now directly rendered, so manual HTML replacement is not needed here for content.
+      // Highlighting can be done via CSS or a library if this was a real app.
+      // For this project, we'll rely on the browser's default <pre><code> rendering with whitespace-pre-wrap.
     }
   }, [codeString]);
 
   const handleCopy = () => {
-    if (codeRef.current) {
-      const el = document.createElement('textarea');
-      el.value = codeString;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      const messageBox = document.getElementById('messageBox');
-      const messageText = document.getElementById('messageText');
-      if (messageBox && messageText) {
-        messageText.textContent = 'Code copied to clipboard!';
-        messageBox.classList.remove('hidden');
-        setTimeout(() => messageBox.classList.add('hidden'), 1500);
-      }
+    // Copying the raw codeString is correct.
+    const el = document.createElement('textarea');
+    el.value = codeString;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const messageBox = document.getElementById('messageBox');
+    const messageText = document.getElementById('messageText');
+    if (messageBox && messageText) {
+      messageText.textContent = 'Code copied to clipboard!';
+      messageBox.classList.remove('hidden');
+      setTimeout(() => messageBox.classList.add('hidden'), 1500);
     }
   };
 
@@ -60,8 +56,8 @@ function CodeBlock({ id, title, codeString, ComponentToRender, sampleProps = {} 
 
       {/* Code Display */}
       <div className={`relative bg-gray-900 rounded-md overflow-hidden mb-4 ${theme === 'dark' ? 'border border-gray-700' : ''}`}>
-        <pre className="p-4 text-sm overflow-x-auto">
-          <code ref={codeRef} className="language-javascript text-gray-50">
+        <pre className="p-4 text-sm overflow-x-auto"> {/* overflow-x-auto is good if lines are very long and whitespace-pre-wrap is not used or for unbreakable strings */}
+          <code ref={codeRef} className="language-javascript text-gray-50 whitespace-pre-wrap">
             {codeString}
           </code>
         </pre>
