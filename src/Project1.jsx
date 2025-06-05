@@ -59,7 +59,7 @@ function ChildComponentB({ onIncrement }) {
 }
 
 // Component for Preserving and Resetting State (used in ReactAdvancedState)
-function CounterWithKey() {
+function CounterWithKey() { // Note: This is a live example component, not a page. Keep its styling.
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -175,11 +175,11 @@ function useToggle(initialValue = false) {
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full relative">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4"> {/* Added p-4 for modal container on small screens */}
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl max-w-sm w-full relative">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl font-bold"
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl font-bold p-1" // Added p-1 for easier touch
         >
           &times;
         </button>
@@ -1314,7 +1314,7 @@ function ContentRenderer({ content, liveComponents, sectionSpecificProps }) {
             return <p key={index} className="mb-4" dangerouslySetInnerHTML={{ __html: block.text }}></p>;
           case 'code':
             return (
-              <pre key={index} className="bg-gray-100 p-3 rounded-lg text-sm mt-2 mb-4 overflow-auto">
+              <pre key={index} className="bg-gray-100 p-3 rounded-lg text-sm mt-2 mb-4 overflow-x-auto">
                 <code>{block.code}</code>
               </pre>
             );
@@ -1328,7 +1328,9 @@ function ContentRenderer({ content, liveComponents, sectionSpecificProps }) {
             );
           case 'heading': {
             const HeadingTag = `h${block.level}`;
-            return <HeadingTag key={index} className={`text-${2 + (3 - block.level)}xl font-semibold text-purple-700 mb-3`}>{block.text}</HeadingTag>;
+            // text-xl md:text-2xl for level 1, text-lg md:text-xl for level 2, text-base md:text-lg for level 3
+            const sizeClass = block.level === 1 ? "text-xl md:text-2xl" : block.level === 2 ? "text-lg md:text-xl" : "text-base md:text-lg";
+            return <HeadingTag key={index} className={`${sizeClass} font-semibold text-purple-700 mb-3`}>{block.text}</HeadingTag>;
           }
           case 'example': {
             const LiveComponent = liveComponents[block.component];
@@ -1353,8 +1355,8 @@ function ContentRenderer({ content, liveComponents, sectionSpecificProps }) {
 // Helper component for consistent section styling
 function Section({ title, children, id }) {
   return (
-    <section id={id} className="bg-gray-50 p-6 rounded-xl shadow-md mb-8 border border-gray-200">
-      <h2 className="text-2xl font-bold text-indigo-600 mb-4 pb-2 border-b-2 border-indigo-200">
+    <section id={id} className="bg-gray-50 p-4 sm:p-6 rounded-xl shadow-md mb-6 sm:mb-8 border border-gray-200">
+      <h2 className="text-xl sm:text-2xl font-bold text-indigo-600 mb-4 pb-2 border-b-2 border-indigo-200">
         {title}
       </h2>
       {children}
@@ -1422,7 +1424,7 @@ function ReactFundamentals({ pageData, liveComponents }) {
 
   return (
     <div className="p-4">
-      <h1 className="text-4xl font-bold text-center text-purple-700 mb-10">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center text-purple-700 mb-10">
         {pageData.title}
       </h1>
       {pageData.sections.map((section, index) => (
@@ -1541,7 +1543,7 @@ function ReactStateAndEvents({ pageData, liveComponents }) {
 
   return (
     <div className="p-4">
-      <h1 className="text-4xl font-bold text-center text-green-700 mb-10">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center text-green-700 mb-10">
         {pageData.title}
       </h1>
       {pageData.sections.map((section, index) => (
@@ -1702,7 +1704,7 @@ function ReactAdvancedState({ pageData, liveComponents }) {
 
   return (
     <div className="p-4">
-      <h1 className="text-4xl font-bold text-center text-blue-700 mb-10">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center text-blue-700 mb-10">
         {pageData.title}
       </h1>
       {pageData.sections.map((section, index) => (
@@ -2052,7 +2054,7 @@ function ReactEffectsTutorial({ pageData, liveComponents }) {
 
   return (
     <div className="p-4">
-      <h1 className="text-4xl font-bold text-center text-indigo-700 mb-10">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center text-indigo-700 mb-10">
         {pageData.title}
       </h1>
       {pageData.sections.map((section, index) => (
@@ -2252,7 +2254,7 @@ function ProjectExamples({ pageData, liveComponents }) {
     ),
     TabbedInterfaceExample: () => (
       <div className="bg-white p-4 rounded-lg shadow-inner mt-4">
-        <div className="flex border-b border-gray-200">
+        <div className="flex flex-wrap border-b border-gray-200">
           <button
             className={`py-2 px-4 font-semibold transition duration-200 ${
               activeTab === 'tab1' ? 'border-b-2 border-blue-500 text-blue-700' : 'text-gray-600 hover:text-blue-500'
@@ -2287,7 +2289,7 @@ function ProjectExamples({ pageData, liveComponents }) {
     ),
     CounterWithReducerExample: () => (
       <div className="bg-white p-4 rounded-lg shadow-inner mt-4">
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center space-x-3 gap-y-2">
           <button
             onClick={() => counterDispatch({ type: 'decrement' })}
             className="bg-gray-400 text-white py-1 px-3 rounded-md hover:bg-gray-500 transition duration-200"
@@ -2343,7 +2345,7 @@ function ProjectExamples({ pageData, liveComponents }) {
     ),
     DarkModeToggleExample: () => (
       <div className="bg-white p-4 rounded-lg shadow-inner mt-4 dark:bg-gray-800 transition-colors duration-300">
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center space-x-2 gap-y-2">
           <label htmlFor="dark-mode-toggle-live" className="text-gray-800 dark:text-gray-200">
             Dark Mode:
           </label>
@@ -2400,18 +2402,20 @@ function ProjectExamples({ pageData, liveComponents }) {
     ),
     StarRatingExample: () => (
       <div className="bg-white p-4 rounded-lg shadow-inner mt-4">
-        <div className="flex">
-          {[1, 2, 3, 4, 5].map((starId) => (
-            <Star
-              key={starId}
-              starId={starId}
-              selected={starId <= (hoverRating || rating)}
-              onSelect={setRating}
-              onHover={setHoverRating}
-              onLeave={() => setHoverRating(0)}
-            />
-          ))}
-          <p className="ml-4 text-lg text-gray-700">Rating: <strong>{rating}</strong> / 5</p>
+        <div className="flex flex-col sm:flex-row items-center">
+          <div className="flex"> {/* Container for stars themselves */}
+            {[1, 2, 3, 4, 5].map((starId) => (
+              <Star
+                key={starId}
+                starId={starId}
+                selected={starId <= (hoverRating || rating)}
+                onSelect={setRating}
+                onHover={setHoverRating}
+                onLeave={() => setHoverRating(0)}
+              />
+            ))}
+          </div>
+          <p className="mt-2 sm:mt-0 sm:ml-4 text-lg text-gray-700">Rating: <strong>{rating}</strong> / 5</p>
         </div>
       </div>
     ),
@@ -2419,7 +2423,7 @@ function ProjectExamples({ pageData, liveComponents }) {
 
   return (
     <div className="p-4">
-      <h1 className="text-4xl font-bold text-center text-purple-700 mb-10">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center text-purple-700 mb-10">
         {pageData.title}
       </h1>
       {pageData.sections.map((section, index) => (
@@ -2434,7 +2438,7 @@ function ProjectExamples({ pageData, liveComponents }) {
 function NodeJsConcepts({ pageData, liveComponents }) {
   return (
     <div className="p-4">
-      <h1 className="text-4xl font-bold text-center text-gray-700 mb-10">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center text-gray-700 mb-10">
         {pageData.title}
       </h1>
       {pageData.sections.map((section, index) => (
@@ -2449,7 +2453,7 @@ function NodeJsConcepts({ pageData, liveComponents }) {
 function AboutMe({ pageData, liveComponents }) {
   return (
     <div className="p-4">
-      <h1 className="text-4xl font-bold text-center text-green-700 mb-10">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center text-green-700 mb-10">
         {pageData.title}
       </h1>
       {pageData.sections.map((section, index) => (
@@ -3466,7 +3470,7 @@ export default function Project1() {
           </svg>
         </button>
 
-        <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl">
+        <div className="max-w-4xl mx-auto bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl">
           <CurrentPage page={navigationTarget.page} />
           <div className="text-center mt-10 text-gray-600 text-sm">
             <p>&copy; 2025 React Tutorials</p>
